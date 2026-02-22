@@ -1366,7 +1366,7 @@ export default function SuratIzinKeramaian({ user: userProp, setTabAndSyncUrl, a
 
 
   const [user, setUser] = useState(() => userProp || getUser());
-
+  const [me, setMe] = useState(meAwalKamu);
 
   const pollRef = useRef(null);
   const hasShownLoadErrorRef = useRef(false);
