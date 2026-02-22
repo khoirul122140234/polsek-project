@@ -1343,7 +1343,7 @@ export default function SuratTandaKehilangan({
 
               <button
                 onClick={async () => {
-                  const ok = confirm("Reset KA SPKT ke default (kosong)?");
+                  const ok = window.confirm("Reset KA SPKT ke default (kosong)?");
                   if (!ok) return;
                   try {
                     await resetSupervisor();
@@ -1677,7 +1677,7 @@ export default function SuratTandaKehilangan({
   };
 
   const handleDelete = async (row) => {
-    const ok = confirm(`Hapus data "${row.nama}"?`);
+    const ok = window.confirm(`Hapus data "${row.nama}"?`);
     if (!ok) return;
 
     try {

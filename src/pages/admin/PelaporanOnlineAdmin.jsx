@@ -1198,7 +1198,7 @@ export default function PelaporanOnlineAdmin() {
   };
 
   const handleDelete = async (row) => {
-    const ok = confirm(`Hapus laporan "${row.nama || "-"}"?`);
+    const ok = window.confirm(`Hapus laporan "${row.nama || "-"}"?`);
     if (!ok) return;
 
     const prevRows = rows;

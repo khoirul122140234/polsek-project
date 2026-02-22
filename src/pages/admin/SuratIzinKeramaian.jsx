@@ -1663,7 +1663,7 @@ export default function SuratIzinKeramaian({ user: userProp, setTabAndSyncUrl, a
   };
 
   const handleDelete = async (row) => {
-    const ok = confirm(`Hapus data "${row.penanggungJawab}"?`);
+    const ok = window.confirm(`Hapus data "${row.penanggungJawab}"?`);
     if (!ok) return;
 
     try {
@@ -1775,7 +1775,7 @@ export default function SuratIzinKeramaian({ user: userProp, setTabAndSyncUrl, a
             </button>
             <button
               onClick={async () => {
-                const ok = confirm("Reset data ke default (kosong)?");
+                const ok = window.confirm("Reset data ke default (kosong)?");
                 if (!ok) return;
                 try {
                   await resetSupervisorToBackend();
