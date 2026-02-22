@@ -154,8 +154,7 @@ function BeritaForm({ initial, onSubmit, onCancel, submitting }) {
   const [errors, setErrors] = useState({});
   const [uploading, setUploading] = useState(false);
 
-  // cache-bust untuk preview
-  const [rev, setRev] = useState(Date.now());
+
 
   const fileRef = useRef(null);
 

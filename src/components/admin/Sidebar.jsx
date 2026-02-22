@@ -180,7 +180,7 @@ export default function Sidebar() {
       }
     });
     return opens;
-  }, [location.pathname, location.search, navFiltered]);
+  }, [location, navFiltered]);
 
   const [open, setOpen] = useState(initialOpen);
   useEffect(() => setOpen(initialOpen), [initialOpen]);

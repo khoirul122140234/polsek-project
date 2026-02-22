@@ -400,31 +400,31 @@ const FilterBar = ({
 /* =====================================================
    Modal Edit (IZIN SAJA)
 ===================================================== */
+const EMPTY_IZIN = {
+  id: null,
+  jenisSurat: "izin",
+  namaOrganisasi: "",
+  penanggungJawab: "",
+  nik: "",
+  hp: "",
+  alamat: "",
+  jenisKegiatan: "",
+  namaKegiatan: "",
+  lokasi: "",
+  tanggal: "",
+  waktuMulai: "",
+  waktuSelesai: "",
+  perkiraanPeserta: "",
+
+  // ✅ BARU (Tahap 1): untuk DASAR no.7
+  rekomDesaNama: "",
+  rekomDesaNomor: "",
+};
+
 const EditModal = ({ open, onClose, data, onSave }) => {
-  const emptyIzin = {
-    id: null,
-    jenisSurat: "izin",
-    namaOrganisasi: "",
-    penanggungJawab: "",
-    nik: "",
-    hp: "",
-    alamat: "",
-    jenisKegiatan: "",
-    namaKegiatan: "",
-    lokasi: "",
-    tanggal: "",
-    waktuMulai: "",
-    waktuSelesai: "",
-    perkiraanPeserta: "",
-
-    // ✅ BARU (Tahap 1): untuk DASAR no.7
-    rekomDesaNama: "",
-    rekomDesaNomor: "",
-  };
-
   const initial = useMemo(() => {
     if (!data) return null;
-    return { ...emptyIzin, ...data };
+    return { ...EMPTY_IZIN, ...data };
   }, [data]);
 
   const [form, setForm] = useState(initial);
@@ -775,6 +775,13 @@ const StatusModal = ({ open, onClose, row, onChangeStatus }) => {
 const SuratIzinPreviewModal = ({ open, onClose, row, signer }) => {
   const [url, setUrl] = React.useState("");
 
+  const rowId = row?.id;
+  const issuedDate = row?.updatedAt || row?.createdAt || "";
+
+  const signerJabatan = signer?.jabatan || "";
+  const signerNama = signer?.nama || "";
+  const signerPangkatNrp = signer?.pangkatNrp || "";
+
   React.useEffect(() => {
     let alive = true;
 
@@ -790,7 +797,7 @@ const SuratIzinPreviewModal = ({ open, onClose, row, signer }) => {
         const blobUrl = await generateIzinKeramaianPDFBlobUrl(row, {
           signer,
           issuedPlace: "Tanjung Raja",
-          issuedDate: row?.updatedAt || row?.createdAt || new Date().toISOString(),
+          issuedDate: issuedDate || new Date().toISOString(),
         });
         if (!alive) return;
         setUrl(blobUrl);
@@ -805,7 +812,7 @@ const SuratIzinPreviewModal = ({ open, onClose, row, signer }) => {
     return () => {
       alive = false;
     };
-  }, [open, row?.id, signer?.jabatan, signer?.nama, signer?.pangkatNrp]);
+  }, [open, rowId, issuedDate, signerJabatan, signerNama, signerPangkatNrp, row, signer]);
 
   React.useEffect(() => {
     if (!open) {

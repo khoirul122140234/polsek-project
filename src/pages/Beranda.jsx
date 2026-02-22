@@ -166,14 +166,7 @@ const Beranda = () => {
     return () => area.removeEventListener("scroll", onScroll);
   }, [activeTab]);
 
-  const goToTab = (idx) => {
-    setActiveTab(idx);
-    const node = slideRefs[idx]?.current;
-    if (node && node.scrollIntoView) {
-      node.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-    }
-  };
-
+  
   /* ==========================
      ✅ Cuplikan Berita (Beranda)
   ========================== */
