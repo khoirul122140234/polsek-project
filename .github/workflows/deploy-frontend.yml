@@ -11,6 +11,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
       - name: Deploy BUILD folder to public_html
         uses: samkirkland/ftp-deploy-action@v4.3.0
         with:
