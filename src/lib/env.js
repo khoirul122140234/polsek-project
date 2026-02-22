@@ -2,8 +2,7 @@
 
 // Base URL backend (tanpa /api), contoh: http://localhost:4000
 const RAW =
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.VITE_API_BASE ||
+  process.env.REACT_APP_API_URL ||
   "http://localhost:4000";
 
 // buang trailing slash agar aman

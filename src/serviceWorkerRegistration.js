@@ -25,7 +25,7 @@ const urlBase64ToUint8Array = (base64) => {
 // - "http://localhost:4000"  -> /api/push/subscribe
 // - "http://localhost:4000/api" -> /push/subscribe (tanpa double /api)
 function resolveSubscribeUrl(apiBase) {
-  const base = (apiBase || import.meta?.env?.VITE_API_BASE || "").trim();
+  const base = (apiBase || process.env.REACT_APP_API_URL || "").trim();
 
   // lewat proxy Vite (kalau tidak set base)
   if (!base) return "/api/push/subscribe";

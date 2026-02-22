@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
-const RAW_API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const RAW_API_BASE = process.env.REACT_APP_API_URL || "http://localhost:4000";
 const API_BASE = RAW_API_BASE.replace(/\/+$/, ""); // hapus trailing slash
 
 // ✅ BATAS WILAYAH (Polsek Tanjung Raja)

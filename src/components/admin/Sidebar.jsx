@@ -102,7 +102,7 @@ export default function Sidebar() {
   const avatarSrc = useMemo(() => {
     const u = user?.avatarUrl;
     if (!u) return "";
-    const base = (import.meta.env.VITE_API_URL || "http://localhost:4000").replace(/\/$/, "");
+    const base = (process.env.REACT_APP_API_URL || "http://localhost:4000").replace(/\/$/, "");
     return u.startsWith("http") ? u : `${base}${u}`;
   }, [user?.avatarUrl]);
 
