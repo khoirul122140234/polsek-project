@@ -154,7 +154,8 @@ function BeritaForm({ initial, onSubmit, onCancel, submitting }) {
   const [errors, setErrors] = useState({});
   const [uploading, setUploading] = useState(false);
 
-
+  // ✅ FIX ESLINT: setRev dipakai di beberapa tempat, jadi definisikan state-nya
+  const [rev, setRev] = useState(0);
 
   const fileRef = useRef(null);
 
