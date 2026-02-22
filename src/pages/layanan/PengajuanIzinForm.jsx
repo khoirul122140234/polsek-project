@@ -112,16 +112,7 @@ export default function PengajuanIzinForm() {
     const onlyDigits = value.replace(/[^\d]/g, "");
     setForm((f) => ({ ...f, [name]: onlyDigits }));
   };
-  const onChangeFile = (e) => {
-    const { name, files } = e.target;
-    const file = files?.[0] ?? null;
-    if (file && file.size > 5 * 1024 * 1024) {
-      alert("Ukuran file maksimal 5MB");
-      e.target.value = "";
-      return;
-    }
-    setForm((f) => ({ ...f, [name]: file }));
-  };
+ 
   const onBlur = (e) => setTouched((t) => ({ ...t, [e.target.name]: true }));
   const handleBack = () => {
     if (window.history.length > 1) window.history.back();

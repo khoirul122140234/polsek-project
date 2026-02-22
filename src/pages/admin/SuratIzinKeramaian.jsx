@@ -1363,10 +1363,10 @@ function SupervisorModal({
 ===================================================== */
 export default function SuratIzinKeramaian({ user: userProp, setTabAndSyncUrl, allowedTabs, tab }) {
   const location = useLocation();
-  const navigate = useNavigate();
+
 
   const [user, setUser] = useState(() => userProp || getUser());
-  const [me, setMe] = useState(null);
+
 
   const pollRef = useRef(null);
   const hasShownLoadErrorRef = useRef(false);

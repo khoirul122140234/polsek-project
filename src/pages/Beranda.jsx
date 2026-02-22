@@ -148,7 +148,6 @@ const Beranda = () => {
 
   // ====== STATE UNTUK TAB/SLIDER INFO LAYANAN ======
   const [activeTab, setActiveTab] = useState(0); // 0: Waktu, 1: Kontak, 2: Lokasi
-  const slideRefs = [useRef(null), useRef(null), useRef(null)];
   const scrollAreaRef = useRef(null);
 
   // sinkronkan activeTab saat user menggeser kartu (mobile)
@@ -166,7 +165,6 @@ const Beranda = () => {
     return () => area.removeEventListener("scroll", onScroll);
   }, [activeTab]);
 
-  
   /* ==========================
      ✅ Cuplikan Berita (Beranda)
   ========================== */

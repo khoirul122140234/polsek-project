@@ -107,7 +107,7 @@ function pickLetterNoFromRow(row) {
   if (code) {
     // coba ambil segmen setelah "SI /"
     // contoh: "SI / 287 / X / 2026 / INTELKAM" => 287
-    const m = code.match(/^\s*SI\s*\/\s*([^/]+)\s*\//i);
+    const m = code.match(/^\s*SI\s*[/]\s*([^/]+)\s*[/]/i);
     if (m && m[1]) {
       const seg = cleanStr(m[1]).replace(/[^\w.-]/g, "");
       if (seg) return seg;
