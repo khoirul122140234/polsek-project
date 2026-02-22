@@ -3,16 +3,34 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.7.0",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "@fontsource-variable/montserrat": "^5.2.7",
+    "@fontsource-variable/public-sans": "^5.2.6",
+    "@fontsource/montserrat": "^5.2.7",
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "font-awesome": "^4.7.0",
+    "framer-motion": "^12.23.12",
+    "helmet": "^8.1.0",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
+    "lucide-react": "^0.540.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.8.1",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "sharp": "^0.34.4",
+    "web-push": "^3.6.7",
+    "web-vitals": "^2.1.4",
+    "workbox-window": "^7.3.0"
   },
   "scripts": {
+    "dev:client": "vite",
+    "dev:server": "npm --prefix server run dev",
+    "dev": "concurrently \"npm:dev:client\" \"npm:dev:server\"",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -35,5 +53,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.50.1",
+    "@vitejs/plugin-react": "^5.0.2",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
+    "postcss": "^8.5.6",
+    "rollup": "^2.79.2",
+    "tailwindcss": "^3.4.17",
+    "vite": "^7.1.5"
   }
 }

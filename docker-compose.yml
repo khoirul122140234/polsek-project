@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16
+    container_name: polsek_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: polsek_db
+
+      # PAKSA AUTH HOST = TRUST (DEV)
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+      # PAKSA initdb set auth-host trust juga
+      POSTGRES_INITDB_ARGS: "--auth-host=trust --auth-local=trust"
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

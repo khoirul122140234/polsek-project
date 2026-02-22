@@ -1,3 +1,12 @@
+/* index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Custom CSS if needed */
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -11,3 +20,30 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Ensure the page layout stretches fully */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+footer {
+  margin-top: auto; /* Pushes footer to the bottom */
+  background-color: #282c34;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+
+@keyframes floatY { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+@keyframes bobY   { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+@keyframes pulseScale { 0%,100% { opacity:.7; transform: scale(1) } 50% { opacity:1; transform: scale(1.08) } }
+
+.float-slow { animation: floatY 5s ease-in-out infinite; }
+.bob-slow { animation: bobY 4s ease-in-out infinite; }
+.bob-slow-delay-2 { animation: bobY 4s ease-in-out .2s infinite; }
+.bob-slow-delay-6 { animation: bobY 4s ease-in-out .6s infinite; }
+.bob-slow-delay-10 { animation: bobY 4s ease-in-out 1s infinite; }
+.pulse-scale { animation: pulseScale 6s ease-in-out infinite; }

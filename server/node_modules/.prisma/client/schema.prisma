@@ -1,0 +1,370 @@
+// prisma/schema.prisma
+
+// ==================== GENERATOR & DATASOURCE ====================
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== USER ROLES ====================
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN_INTELKAM
+  ADMIN_KASIUM
+  ADMIN_SPKT
+}
+
+// ==================== USER & PROFIL PIMPINAN ====================
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+
+  // ✅ Role aman pakai enum (bukan string bebas)
+  role UserRole @default(ADMIN_SPKT)
+
+  // ✅ status akun (untuk nonaktif tanpa delete)
+  isActive Boolean @default(true)
+
+  // ✅ tambahan profil (untuk My Profile)
+  nrp       String?
+  pangkat   String?
+  satuan    String?
+  avatarUrl String?
+
+  // ✅ PROFIL TTD SURAT (KAPOLSEK / PENANGGUNG JAWAB) — untuk IZIN
+  // disimpan per akun admin agar tidak reset dan konsisten lintas device
+  ttdJabatan String?
+  ttdNama    String?
+  ttdPangkat String?
+  ttdNrp     String?
+
+  // ✅ BARU: PROFIL STPLK (KA SPKT) — untuk Surat Tanda Kehilangan
+  // dipisah dari ttd* agar tidak saling menimpa dengan surat izin keramaian
+  stplkLabel   String?
+  stplkJabatan String?
+  stplkNama    String?
+  stplkPangkat String?
+  stplkNrp     String?
+
+  // ✅ audit: siapa yg membuat akun ini (opsional)
+  createdById  Int?
+  createdBy    User?  @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdUsers User[] @relation("UserCreatedBy")
+
+  // ✅ back-relation untuk SuratRekap.createdBy
+  createdSuratRekap SuratRekap[] @relation("UserCreatedSuratRekap")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Back-relation untuk News.sharedBy & Education.sharedBy
+  sharedNews       News[]             @relation("NewsSharedBy")
+  sharedEducation  Education[]        @relation("EducationSharedBy")
+  PushSubscription PushSubscription[]
+
+  @@index([role])
+  @@index([isActive])
+  @@index([createdById])
+}
+
+model LeaderProfile {
+  id        Int      @id @default(autoincrement())
+  roleKey   String   @unique // "kapolsek" | "wakapolsek"
+  nama      String
+  jabatan   String
+  pesan     String
+  bio       String
+  fotoUrl   String? // optional
+  updatedAt DateTime @updatedAt
+  updatedBy Int? // user id pengubah terakhir (scalar; optional)
+}
+
+// ==================== UNIT & ANGGOTA ====================
+model Unit {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  logo        String?
+  description String?
+  anggota     Anggota[]
+}
+
+model Anggota {
+  id       Int     @id @default(autoincrement())
+  nama     String
+  jabatan  String
+  foto_url String?
+  unit_id  Int
+  unit     Unit    @relation(fields: [unit_id], references: [id])
+}
+
+// ==================== FASILITAS ====================
+model Facility {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  image       String? // simpan path relatif ex: "/uploads/xxx.webp"
+  sortOrder   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==================== BERITA ====================
+model News {
+  id    Int      @id @default(autoincrement())
+  title String
+  slug  String   @unique
+  date  DateTime
+
+  image  String?
+  images Json?
+
+  excerpt    String
+  content    String
+  popularity Int    @default(0)
+
+  viewCount      Int   @default(0)
+  shareCount     Int   @default(0)
+  sharedByUserId Int?
+  sharedBy       User? @relation("NewsSharedBy", fields: [sharedByUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sharedByUserId])
+  @@index([date])
+  @@index([popularity])
+}
+
+model Education {
+  id    Int      @id @default(autoincrement())
+  title String
+  slug  String   @unique
+  date  DateTime
+
+  image  String?
+  images Json?
+
+  excerpt    String?
+  content    String
+  popularity Int     @default(0)
+
+  viewCount      Int   @default(0)
+  shareCount     Int   @default(0)
+  sharedByUserId Int?
+  sharedBy       User? @relation("EducationSharedBy", fields: [sharedByUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sharedByUserId])
+  @@index([date])
+  @@index([popularity])
+}
+
+// ==================== (SURAT / PENGAJUAN) ====================
+enum LetterType {
+  IZIN_KERAMAIAN
+  TANDA_KEHILANGAN
+}
+
+enum LetterStatus {
+  DRAFT
+  DIAJUKAN
+  DIVERIFIKASI
+  DITOLAK
+  SELESAI
+}
+
+/**
+ * ✅ BARU:
+ * Counter nomor surat agar:
+ * - Nomor dibuat saat admin set SELESAI (tidak loncat)
+ * - Bisa di-set "mulai dari nomor berapa"
+ * - Disimpan per type + year (reset otomatis per tahun)
+ */
+model LetterCounter {
+  id         Int        @id @default(autoincrement())
+  type       LetterType
+  year       Int
+  nextNumber Int        @default(1)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([type, year])
+  @@index([type, year])
+}
+
+model LetterApplication {
+  id             String       @id @default(cuid())
+  code           String       @unique
+  type           LetterType
+  status         LetterStatus @default(DIAJUKAN)
+  statusFeedback String?      @default("")
+
+  /**
+   * ✅ BARU:
+   * nomor urut dan nomor surat final STPLK (dibuat saat status SELESAI)
+   */
+  nomorUrut  Int?
+  nomorSurat String?
+
+  nik    String
+  hp     String
+  alamat String
+
+  namaOrganisasi String?
+
+  // ✅ BARU: Kecamatan (untuk pembatasan wilayah Polsek)
+  // dibuat nullable agar aman untuk data lama
+  kecamatan String?
+
+  penanggungJawab     String?
+  jenisKegiatan       String?
+  namaKegiatan        String?
+  lokasi              String?
+  tanggal             DateTime?
+  waktuMulai          String?
+  waktuSelesai        String?
+  perkiraanPeserta    Int?
+  ktpPath             String?
+  rekomendasiDesaPath String?
+
+  // ✅ BARU (Tahap 1): admin isi untuk DASAR no.7
+  rekomDesaNama  String?
+  rekomDesaNomor String?
+
+  nama         String?
+  tempatLahir  String?
+  tanggalLahir DateTime?
+  jenisKelamin String?
+  pekerjaan    String?
+  agama        String?
+
+  kehilanganItems Json?
+
+  kehilanganApa  String?
+  kronologi      String?
+  tanggalLaporan DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type, status])
+  @@index([createdAt])
+  @@index([nik])
+  @@index([kecamatan])
+}
+
+enum OnlineReportStatus {
+  BARU
+  DIPROSES
+  SELESAI
+  DITOLAK
+}
+
+model OnlineReport {
+  id   String @id @default(cuid())
+  code String @unique
+
+  status         OnlineReportStatus @default(BARU)
+  statusFeedback String?            @default("")
+
+  nama String
+  nik  String
+  hp   String
+
+  kecamatan String?
+
+  jenis     String
+  lokasi    String
+  tanggal   DateTime
+  jam       String
+  kronologi String
+
+  lampiranPath String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([nik])
+  @@index([jenis])
+}
+
+model SuratRekap {
+  id          Int      @id @default(autoincrement())
+  tanggal     DateTime
+  noSurat     String
+  kepada      String
+  perihal     String
+  disposisiKa String?
+  paraf       String?
+
+  createdById Int?
+  createdBy   User? @relation("UserCreatedSuratRekap", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tanggal])
+  @@index([noSurat])
+  @@index([createdById])
+}
+
+// ==================== DOKUMEN (PUBLIK) ====================
+// Dokumen dikelola SuperAdmin (tahap berikutnya admin CRUD),
+// tapi endpoint publik hanya membaca yg isActive = true.
+model Document {
+  id String @id @default(cuid())
+
+  title       String
+  category    String? // contoh: "SOP", "Form", "Panduan"
+  description String? // deskripsi singkat
+
+  // simpan path/url file (relatif direkomendasikan), contoh:
+  // "/uploads/docs/sop-piket.pdf"
+  // atau url penuh "https://..."
+  fileUrl  String
+  fileName String?
+
+  // urutan tampil di publik
+  sortOrder Int @default(0)
+
+  // tampilkan/hide di publik
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
+  @@index([category])
+}
+
+//////////////////////////////////////////////////////////////
+// ✅ BARU: PUSH SUBSCRIPTION (untuk notifikasi perubahan status)
+// Disimpan di DB agar tidak hilang saat server restart
+//////////////////////////////////////////////////////////////
+model PushSubscription {
+  id           Int    @id @default(autoincrement())
+  endpoint     String @unique
+  subscription Json
+
+  // opsional (kalau nanti mau ikat ke user login)
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
